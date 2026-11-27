@@ -1,0 +1,13 @@
+{
+  "name": "melodi_supervisor_instance",
+  "title": "MELODI Supervisor Instance",
+  "version": "1.0.0",
+  "description": "Agent sécurisé embarqué sur une instance MELODI centrale pour la connexion au Supervisor Center, le verrouillage en mode supervisé ('managed') et la synchronisation automatique via les hooks de base.",
+  "author": "Byt3Lab",
+  "type_distribution": "central",
+  "icon": "name=shield&fill=059669",
+  "depends": [
+    "base"
+  ],
+  "depends_python": []
+}

@@ -1,0 +1,13 @@
+{
+  "supervisor_instance.title": "MELODI Supervisor Instance",
+  "supervisor_instance.subtitle": "Connexion sécurisée au Superviseur Central, verrouillage des mises à jour locales et convergence automatique.",
+  "supervisor_instance.pair_title": "Enrôler cette instance",
+  "supervisor_instance.center_url": "URL du Superviseur Central",
+  "supervisor_instance.instance_name": "Nom de cette instance",
+  "supervisor_instance.otp_token": "Jeton d'enrôlement à usage unique (OTP)",
+  "supervisor_instance.allow_http": "Autoriser HTTP (réseau privé / développement uniquement)",
+  "supervisor_instance.pair_btn": "Connecter et passer en mode supervisé",
+  "supervisor_instance.sync_now": "Synchroniser maintenant",
+  "supervisor_instance.disconnect_btn": "Déconnecter du Superviseur Central (Break-Glass)",
+  "supervisor_instance.managed_notice": "Cette instance est en mode supervisé (managed). Les mises à jour de modules, du Core, des langues et les redémarrages sont pilotés exclusivement par le Superviseur Central."
+}

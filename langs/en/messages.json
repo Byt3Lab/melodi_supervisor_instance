@@ -1,0 +1,13 @@
+{
+  "supervisor_instance.title": "MELODI Supervisor Instance",
+  "supervisor_instance.subtitle": "Secure connection to Supervisor Center, local update lock, and automatic schema convergence.",
+  "supervisor_instance.pair_title": "Enroll this Instance",
+  "supervisor_instance.center_url": "Supervisor Center URL",
+  "supervisor_instance.instance_name": "Instance Name",
+  "supervisor_instance.otp_token": "Single-use Enrollment Token (OTP)",
+  "supervisor_instance.allow_http": "Allow HTTP (private network / dev only)",
+  "supervisor_instance.pair_btn": "Connect & Enable Managed Mode",
+  "supervisor_instance.sync_now": "Sync Now",
+  "supervisor_instance.disconnect_btn": "Disconnect from Supervisor Center (Break-Glass)",
+  "supervisor_instance.managed_notice": "This instance is running in managed mode. Module, Core, language updates and restarts are exclusively orchestrated by the Supervisor Center."
+}

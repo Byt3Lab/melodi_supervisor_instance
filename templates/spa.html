@@ -1,0 +1,104 @@
+<link rel="stylesheet" href="{{ _url('static', {'module': 'melodi_supervisor_instance', 'path': ['spa', 'instance.css']}) }}">
+
+<div class="container-fluid py-3 melodi-supervisor-instance">
+  <div id="melodi-supervisor-instance-app">
+    <div class="ds-card p-4 shadow-sm">
+      <div class="ds-skeleton-line mb-3" style="width: 240px; height: 28px;"></div>
+      <div class="ds-skeleton-line" style="height: 110px;"></div>
+    </div>
+  </div>
+</div>
+
+<template id="tpl-supervisor-instance-spa">
+  <div>
+    <div class="ds-page-header mb-4">
+      <div class="ds-page-header-title-box">
+        <h1 class="ds-page-header-title mb-1">{{ t('supervisor_instance.title', 'MELODI Supervisor Instance') }}</h1>
+        <p class="ds-page-header-subtitle mb-0">{{ t('supervisor_instance.subtitle', 'Connexion sécurisée au Superviseur Central, verrouillage des mises à jour locales et convergence automatique.') }}</p>
+      </div>
+      <div class="ds-page-header-actions ds-scroll-x">
+        <span class="ds-badge" :class="status?.supervision_mode === 'managed' ? 'ds-badge-success' : 'ds-badge-secondary'">
+          Mode : [[ (status?.supervision_mode || 'standalone').toUpperCase() ]]
+        </span>
+      </div>
+    </div>
+
+    <div v-if="error" class="ds-alert ds-alert-danger mb-3" role="alert">[[ error ]]</div>
+    <div v-if="successMsg" class="ds-alert ds-alert-success mb-3" role="status">[[ successMsg ]]</div>
+
+    <!-- Non pairé : Formulaire d'enrôlement OTP -->
+    <div v-if="status && !status.paired" class="row justify-content-center">
+      <div class="col-12 col-lg-7">
+        <div class="ds-card p-4">
+          <h5 class="mb-3">{{ t('supervisor_instance.pair_title', 'Enrôler cette instance') }}</h5>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">{{ t('supervisor_instance.center_url', 'URL du Superviseur Central') }}</label>
+            <input type="url" class="ds-input w-100" v-model="pairForm.center_url" placeholder="https://center.exemple.com">
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">{{ t('supervisor_instance.instance_name', 'Nom de cette instance') }}</label>
+            <input type="text" class="ds-input w-100" v-model="pairForm.instance_name" placeholder="ex: Prod-EU-01">
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">{{ t('supervisor_instance.otp_token', "Jeton d'enrôlement à usage unique (OTP)") }}</label>
+            <input type="password" class="ds-input w-100 sup-mono" v-model="pairForm.enrollment_token" placeholder="msup_otp_...">
+          </div>
+          <div class="form-check mb-4">
+            <input class="form-check-input" type="checkbox" id="chk-allow-http" v-model="pairForm.allow_insecure_http">
+            <label class="form-check-label small" for="chk-allow-http">{{ t('supervisor_instance.allow_http', 'Autoriser HTTP (réseau privé / développement uniquement)') }}</label>
+          </div>
+          <button type="button" class="ds-btn ds-btn-primary w-100" @click="pairWithCenter" :disabled="busy || !pairForm.center_url || !pairForm.enrollment_token">
+            <span v-if="busy" class="ds-spinner ds-spinner-sm me-1" aria-hidden="true"></span>
+            {{ t('supervisor_instance.pair_btn', 'Connecter et passer en mode supervisé') }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pairé : Statut Managed & Actions -->
+    <div v-if="status && status.paired" class="row g-3">
+      <div class="col-12">
+        <div class="ds-alert ds-alert-info mb-0">
+          {{ t('supervisor_instance.managed_notice', 'Cette instance est en mode supervisé (managed). Les mises à jour de modules, du Core, des langues et les redémarrages sont pilotés exclusivement par le Superviseur Central.') }}
+        </div>
+      </div>
+      <div class="col-12 col-lg-8">
+        <div class="ds-card p-4">
+          <div class="row g-3">
+            <div class="col-12 col-md-6">
+              <div class="small text-muted">Superviseur Central</div>
+              <div class="sup-mono fw-semibold">[[ status.center_url ]]</div>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="small text-muted">ID Instance</div>
+              <div class="sup-mono fw-semibold">[[ status.instance_id ]]</div>
+            </div>
+            <div class="col-6 col-md-4">
+              <div class="small text-muted">Version Schéma</div>
+              <div class="fw-semibold">v[[ status.synced_manifest_version ]]</div>
+            </div>
+            <div class="col-6 col-md-4">
+              <div class="small text-muted">Dernière sync</div>
+              <div class="fw-semibold">[[ status.last_sync_status || '-' ]]</div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="small text-muted">Core / Boot TS</div>
+              <div class="sup-mono">[[ status.inventory?.core_version || '-' ]] / [[ status.inventory?.boot_ts || '-' ]]</div>
+            </div>
+          </div>
+          <div class="d-flex flex-wrap gap-2 mt-4">
+            <button type="button" class="ds-btn ds-btn-primary" @click="syncNow" :disabled="busy">
+              <span v-if="busy" class="ds-spinner ds-spinner-sm me-1" aria-hidden="true"></span>
+              {{ t('supervisor_instance.sync_now', 'Synchroniser maintenant') }}
+            </button>
+            <button type="button" class="ds-btn ds-btn-danger ms-auto" @click="disconnect" :disabled="busy">
+              {{ t('supervisor_instance.disconnect_btn', 'Déconnecter du Superviseur Central (Break-Glass)') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script type="module" src="{{ _url('static', {'module': 'melodi_supervisor_instance', 'path': ['spa', 'app.js']}) }}"></script>
